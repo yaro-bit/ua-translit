@@ -1,4 +1,4 @@
-# UAtranslit (Desktop Pro High-Contrast)
+# UAtranslit
 
 A high-performance, client-side Ukrainian transliterator designed as a privacy-first, zero-dependency alternative to legacy tools like translit.ru.
 
