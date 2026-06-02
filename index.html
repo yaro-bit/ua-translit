@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Ukrainian Transliterator</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght=0,300;0,400;0,500;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
 :root {
   --bg-main: #07070a;
@@ -17,9 +17,9 @@
   --text-hint: #808095;
   --accent-blue: #5fa8ff;
   --accent-yellow: #ffe082;
+  --accent-red: #ff6b6b;
   --headline-color: #555566;
 }
-
 [data-theme="light"] {
   --bg-main: #f0f2f5;
   --bg-surface: #ffffff;
@@ -31,63 +31,83 @@
   --text-hint: #555566;
   --accent-blue: #0052cc;
   --accent-yellow: #997000;
+  --accent-red: #cc2200;
   --headline-color: #666677;
 }
-
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg-main);color:var(--text-primary);font-family:'DM Mono',monospace;transition: background 0.12s, color 0.12s;overflow-x:hidden}
-.wrap{min-height:100vh;background:var(--bg-main)}
-
-/* Header */
-.hdr{border-bottom:1px solid var(--border-color);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface)}
-.hdr-controls{display:flex;align-items:center;gap:12px}
-.logo{font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent-blue);font-weight:500;user-select:none}
+body{background:var(--bg-main);color:var(--text-primary);font-family:'DM Mono',monospace;transition:background .12s,color .12s;overflow-x:hidden}
+.wrap{min-height:100vh;background:var(--bg-main);display:flex;flex-direction:column}
+.hdr{border-bottom:1px solid var(--border-color);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface)}
+.hdr-controls{display:flex;align-items:center;gap:16px}
+.logo{font-size:14px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent-blue);font-weight:500;user-select:none}
 .logo span{color:var(--accent-yellow);margin-right:5px}
+.mode-toggle,.theme-toggle-wrap{display:flex;align-items:center;background:var(--bg-control);border:1px solid var(--border-color);border-radius:6px;padding:4px}
+.mode-btn,.theme-btn{padding:6px 16px;border-radius:4px;border:none;cursor:pointer;font-size:12px;letter-spacing:.06em;font-family:'DM Mono',monospace;transition:all .12s;background:transparent;color:var(--text-muted);font-weight:500}
+.mode-btn.active,.theme-btn.active{background:var(--accent-blue);color:var(--bg-main);font-weight:600}
+.mode-btn:hover:not(.active),.theme-btn:hover:not(.active){color:var(--text-primary);background:rgba(255,255,255,.06)}
 
-.mode-toggle, .theme-toggle-wrap{display:flex;align-items:center;background:var(--bg-control);border:1px solid var(--border-color);border-radius:6px;padding:4px}
-.mode-btn, .theme-btn{padding:6px 16px;border-radius:4px;border:none;cursor:pointer;font-size:12px;letter-spacing:.06em;font-family:'DM Mono',monospace;transition:all .12s;background:transparent;color:var(--text-muted);font-weight:500}
-.mode-btn.active, .theme-btn.active{background:var(--accent-blue);color:var(--bg-main);font-weight:600}
-.mode-btn:hover:not(.active), .theme-btn:hover:not(.active){color:var(--text-primary);background:rgba(255,255,255,0.06)}
-
-/* Desktop Workspace Split */
-.main{max-width:1440px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start}
-
-/* Linke Spalte: Editor */
+.main{max-width:1440px;width:100%;margin:0 auto;padding:40px 32px;display:grid;grid-template-columns:3fr 1fr;gap:40px;align-items:start;flex:1}
 .editor-section{display:flex;flex-direction:column}
-.headline{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--headline-color);margin-bottom:16px;font-weight:500}
-.hint{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:6px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:var(--text-muted);line-height:1.6}
-.hint kbd{display:inline-block;background:var(--bg-control);border:1px solid var(--border-color);border-radius:4px;padding:1px 6px;color:var(--accent-yellow);font-size:11px;font-family:'DM Mono',monospace;margin:0 2px;font-weight:500}
-.lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-blue);margin-bottom:8px;display:block;font-weight:500}
+.headline{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--headline-color);margin-bottom:18px;font-weight:500}
+.hint{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;padding:16px 20px;margin-bottom:24px;font-size:12px;color:var(--text-muted);line-height:1.6;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.hint kbd{display:inline-block;background:var(--bg-control);border:1px solid var(--border-color);border-radius:4px;padding:2px 6px;color:var(--accent-yellow);font-size:11px;font-family:'DM Mono',monospace;margin:0 2px;font-weight:500}
+.lbl{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent-blue);margin-bottom:12px;display:block;font-weight:500}
 
-textarea{width:100%;height:420px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:21px;font-family:'DM Mono',monospace;line-height:1.6;padding:20px;resize:vertical;outline:none;transition:border-color .15s;caret-color:var(--accent-yellow)}
-textarea:focus{border-color:var(--accent-blue);box-shadow: 0 0 0 1px var(--accent-blue)}
-.ccount{font-size:12px;color:var(--text-muted);text-align:right;margin-top:6px;font-family:'DM Mono',monospace}
+.editor-wrap{position:relative;width:100%}
+textarea{width:100%;height:460px;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:18px;font-family:'DM Mono',monospace;line-height:1.6;padding:24px;resize:vertical;outline:none;transition:border-color .15s,box-shadow .15s;caret-color:var(--accent-yellow);position:relative;z-index:1}
+textarea:focus{border-color:var(--accent-blue);box-shadow:0 0 0 2px rgba(95,168,255,0.15)}
+#lt-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:hidden;border-radius:8px;padding:24px;font-size:18px;font-family:'DM Mono',monospace;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;color:transparent;border:1px solid transparent;box-sizing:border-box}
 
-.action-row{display:flex;gap:10px;margin:16px 0 0}
-.btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:.06em;font-family:'DM Mono',monospace;transition:all .12s;text-align:center;font-weight:500}
-.btn-blue{background:rgba(95,168,255,.12);border:1px solid var(--accent-blue);color:var(--accent-blue)}
-.btn-blue:hover{background:var(--accent-blue);color:var(--bg-main);font-weight:600}
-.btn-yellow{background:rgba(255,224,130,.1);border:1px solid var(--accent-yellow);color:var(--accent-yellow)}
-.btn-yellow:hover{background:var(--accent-yellow);color:var(--bg-main);font-weight:600}
-.btn-ghost{background:var(--bg-control);border:1px solid var(--border-color);color:var(--text-primary)}
+.lt-error{text-decoration:underline wavy var(--accent-red);text-decoration-skip-ink:none;pointer-events:auto;cursor:pointer;color:transparent;position:relative}
+
+#lt-dropdown{position:absolute;background:var(--bg-surface);border:1px solid var(--border-color);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.35);z-index:200;display:none;min-width:140px;overflow:hidden;padding:4px 0}
+.lt-drop-item{width:100%;text-align:left;background:none;border:none;padding:8px 14px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text-primary);cursor:pointer;display:block;transition:background .1s}
+.lt-drop-item:hover{background:var(--bg-control);color:var(--accent-blue)}
+.lt-drop-ignore{border-top:1px solid var(--border-subtle);color:var(--text-hint);margin-top:4px;padding-top:8px}
+.lt-drop-ignore:hover{color:var(--accent-red);background:var(--bg-control)}
+.lt-drop-empty{padding:8px 14px;font-size:11px;color:var(--text-hint);font-style:italic}
+
+.grammar-status{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.grammar-dot{width:8px;height:8px;border-radius:50%;background:var(--border-color);display:inline-block;transition:background .2s}
+.grammar-dot.checking{background:var(--accent-yellow);animation:blink .8s ease-in-out infinite}
+.grammar-dot.errors{background:var(--accent-red)}
+.grammar-dot.clean{background:#7ec87e}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+.ccount{font-size:12px;color:var(--text-muted);text-align:right;font-family:'DM Mono',monospace}
+
+.action-row{display:flex;gap:12px;margin:24px 0 0;flex-wrap:wrap}
+.btn{padding:12px 24px;border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:.06em;font-family:'DM Mono',monospace;transition:all .12s;text-align:center;font-weight:500;border:1px solid transparent}
+.btn-blue{background:rgba(95,168,255,0.08);border-color:rgba(95,168,255,0.3);color:var(--accent-blue)}
+.btn-blue:hover{background:var(--accent-blue);color:var(--bg-main);border-color:var(--accent-blue);font-weight:600}
+.btn-yellow{background:rgba(255,224,130,0.08);border-color:rgba(255,224,130,0.3);color:var(--accent-yellow);margin-left:auto}
+.btn-ghost{background:var(--bg-control);border-color:var(--border-color);color:var(--text-primary)}
 .btn-ghost:hover{background:var(--border-color);border-color:var(--text-muted)}
 
-/* Rechte Spalte: Feste Zeichentabelle */
-.table-wrap{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;padding:20px}
-.table-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-blue);margin-bottom:16px;display:block;border-bottom:1px solid var(--border-subtle);padding-bottom:8px;font-weight:500}
-.char-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:8px}
-.char-cell{background:var(--bg-control);border:1px solid var(--border-color);border-radius:4px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .1s;user-select:none}
-.char-cell:hover{border-color:var(--accent-blue);background:var(--border-color);transform:scale(1.04)}
-.cell-lat{font-size:11px;color:var(--text-muted);display:block;margin-bottom:2px;letter-spacing:.03em}
+.table-wrap{background:var(--bg-surface);border:1px solid var(--border-color);border-radius:8px;padding:24px;width:100%;max-width:340px;justify-self:end;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.table-lbl{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-blue);margin-bottom:16px;display:block;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;font-weight:500}
+.char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.char-cell{background:var(--bg-control);border:1px solid var(--border-color);border-radius:6px;padding:12px 4px;text-align:center;cursor:pointer;transition:all .12s;user-select:none}
+.char-cell:hover{border-color:var(--accent-blue);background:var(--bg-surface);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.cell-lat{font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;letter-spacing:.03em}
 .cell-cyr{font-size:18px;color:var(--text-primary);display:block;font-weight:500}
 
-/* Toast Notification */
-.toast{position:fixed;bottom:32px;left:32px;background:var(--accent-blue);color:var(--bg-main);padding:10px 22px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.1em;pointer-events:none;z-index:999;opacity:0;transition:opacity .15s}
+.toast{position:fixed;bottom:32px;left:32px;background:var(--accent-blue);color:var(--bg-main);padding:12px 24px;border-radius:6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:700;letter-spacing:.1em;pointer-events:none;z-index:999;opacity:0;transition:opacity .15s;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
 .toast.show{opacity:1}
+.footer{border-top:1px solid var(--border-subtle);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:var(--bg-surface);margin-top:auto}
+.footer-left{font-size:11px;color:var(--text-hint);letter-spacing:.08em}
+.footer-right{font-size:11px;color:var(--text-hint);letter-spacing:.08em}
+.footer a{color:var(--accent-blue);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .12s}
+.footer a:hover{border-bottom-color:var(--accent-blue)}
+
+@media(max-width: 1024px) {
+  .main { grid-template-columns: 1fr; gap: 32px; }
+  .table-wrap { max-width: 100%; justify-self: stretch; }
+  .char-grid { grid-template-columns: repeat(6, 1fr); }
+  .btn-yellow { margin-left: 0; }
+}
 </style>
 </head>
 <body>
-
 <div class="wrap">
 <header class="hdr">
   <div class="logo"><span>UA</span>translit</div>
@@ -97,48 +117,66 @@ textarea:focus{border-color:var(--accent-blue);box-shadow: 0 0 0 1px var(--accen
       <button class="theme-btn" id="theme-light" onclick="setTheme('light')">light</button>
     </div>
     <div class="mode-toggle">
-      <button class="mode-btn active" id="btn-lat2cyr" onclick="setMode('lat2cyr')">lat → укр</button>
-      <button class="mode-btn" id="btn-cyr2lat" onclick="setMode('cyr2lat')">укр → lat</button>
+      <button class="mode-btn active" id="btn-lat2cyr" onclick="setMode('lat2cyr')">lat &rarr; укр</button>
+      <button class="mode-btn" id="btn-cyr2lat" onclick="setMode('cyr2lat')">укр &rarr; lat</button>
     </div>
   </div>
 </header>
 
 <main class="main">
-  <!-- Linke Seite: Editor -->
   <section class="editor-section">
-    <div class="headline">Ukrainian transliterator · ua-translit</div>
-
+    <div class="headline">Ukrainian transliterator &middot; ua-translit</div>
     <div class="hint">
-      <kbd>Esc</kbd> toggle mode &nbsp;·&nbsp;
-      <kbd>s</kbd>→с &nbsp;<kbd>sh</kbd>→ш &nbsp;<kbd>shh</kbd>→щ &nbsp;
-      <kbd>g'</kbd>→ґ &nbsp;<kbd>i'</kbd>→ї &nbsp;<kbd>zh</kbd>→ж &nbsp;
-      <kbd>ch</kbd>→ч &nbsp;<kbd>+</kbd> separates digraphs &nbsp;·&nbsp;
+      <kbd>Esc</kbd> toggle mode &nbsp;&middot;&nbsp;
+      <kbd>s</kbd>&rarr;с &nbsp;<kbd>sh</kbd>&rarr;ш &nbsp;<kbd>shh</kbd>&rarr;щ &nbsp;
+      <kbd>g'</kbd>&rarr;ґ &nbsp;<kbd>i'</kbd>&rarr;ї &nbsp;<kbd>zh</kbd>&rarr;ж &nbsp;
+      <kbd>ch</kbd>&rarr;ч &nbsp;<kbd>+</kbd> separates digraphs &nbsp;&middot;&nbsp;
       <kbd>Ctrl+Z</kbd> undo
     </div>
-
-    <span class="lbl" id="editor-lbl">type latin — get ukrainian</span>
-    <textarea id="ta" placeholder="Pryvit, svite..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-    <div class="ccount"><span id="ccount">0</span> chars</div>
-
+    <span class="lbl" id="editor-lbl">type latin &mdash; get ukrainian</span>
+    <div class="editor-wrap" id="editor-wrap-container">
+      <div id="lt-overlay" aria-hidden="true"></div>
+      <textarea id="ta" placeholder="Pryvit, svite..." spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+      <div class="grammar-status">
+        <span class="grammar-dot" id="grammar-dot"></span>
+        <span id="grammar-msg" style="font-size:11px;color:var(--text-hint)">grammar check ready</span>
+      </div>
+      <div class="ccount"><span id="ccount">0</span> chars</div>
+    </div>
     <div class="action-row">
-      <button class="btn btn-blue" onclick="convertAll('cyr2lat')">→ to latin</button>
-      <button class="btn btn-blue" onclick="convertAll('lat2cyr')">→ to ukrainian</button>
+      <button class="btn btn-blue" onclick="convertAll('cyr2lat')">&rarr; to latin</button>
+      <button class="btn btn-blue" onclick="convertAll('lat2cyr')">&rarr; to ukrainian</button>
       <button class="btn btn-yellow" onclick="copyText()">copy to clipboard</button>
       <button class="btn btn-ghost" onclick="clearText()">clear</button>
     </div>
   </section>
 
-  <!-- Rechte Seite: Zeichentabelle -->
   <aside class="table-wrap">
     <span class="table-lbl">character map</span>
     <div class="char-grid" id="char-grid"></div>
   </aside>
 </main>
+
+<footer class="footer">
+  <span class="footer-left"></span>
+  <span class="footer-right">
+    by <a href="https://github.com/yaro-bit" target="_blank" rel="noopener">@yaro-bit</a>
+    &nbsp;&middot;&nbsp;
+    <a href="https://github.com/yaro-bit" target="_blank" rel="noopener">github</a>
+    &nbsp;&middot;&nbsp;
+    grammar by <a href="https://languagetool.org" target="_blank" rel="noopener">LanguageTool</a>
+  </span>
+</footer>
 </div>
 
-<div class="toast" id="toast">copied to clipboard ✓</div>
+<div id="lt-dropdown"></div>
+
+<div class="toast" id="toast">copied to clipboard &#10003;</div>
 
 <script>
+/* Transliteration tables */
 const tra={},abc2={},abc1={};
 tra['a']=['й+','и+','Й+','И+','й','и','Й','И','',''];
 abc2['a']=['йа','иа','Йа','Иа','я','я','Я','Я','а','a'];
@@ -208,6 +246,7 @@ function transStr2(s){let o='';for(let i=0;i<s.length;i++)o=transSym2(o+s[i]);re
 function transSym1(s){return abc1[s]!==undefined?abc1[s]:s;}
 function transStr1(s){let o='';for(let i=0;i<s.length;i++)o+=transSym1(s[i]);return o;}
 
+/* Character map */
 const CHARS=[
   ['a','а'],['b','б'],['v','в'],['g','г'],["g'",'ґ'],['d','д'],
   ['e','е'],['je/ö','є'],['zh','ж'],['z','з'],['y','и'],['i','і'],
@@ -216,19 +255,20 @@ const CHARS=[
   ['f','ф'],['h/x','х'],['c','ц'],['ch','ч'],['sh/w','ш'],['shh/q','щ'],
   ["'",'ь'],['ju/ü','ю'],['ja','я']
 ];
-
 const grid=document.getElementById('char-grid');
 CHARS.forEach(([lat,cyr])=>{
   const cell=document.createElement('div');
   cell.className='char-cell';
-  cell.innerHTML=`<span class="cell-lat">${lat}</span><span class="cell-cyr">${cyr}</span>`;
+  cell.innerHTML='<span class="cell-lat">'+lat+'</span><span class="cell-cyr">'+cyr+'</span>';
   cell.onclick=()=>insertChar(cyr);
   grid.appendChild(cell);
 });
 
+/* Core state */
 let mode='lat2cyr';
 const undoStack=[];
 const ta=document.getElementById('ta');
+const overlay=document.getElementById('lt-overlay');
 
 function setMode(m){
   mode=m;
@@ -237,39 +277,190 @@ function setMode(m){
   document.getElementById('editor-lbl').textContent=m==='lat2cyr'?'type latin — get ukrainian':'type ukrainian — get latin';
   ta.placeholder=m==='lat2cyr'?'Pryvit, svite...':'Привіт, світе...';
   ta.focus();
+  closeDropdown();
+  scheduleCheck();
 }
 
 function setTheme(t){
-  document.documentElement.setAttribute('data-theme', t);
+  document.documentElement.setAttribute('data-theme',t);
   document.getElementById('theme-dark').className='theme-btn'+(t==='dark'?' active':'');
   document.getElementById('theme-light').className='theme-btn'+(t==='light'?' active':'');
-  try { localStorage.setItem('ua-translit-theme', t); } catch(e) {}
+  try{localStorage.setItem('ua-translit-theme',t);}catch(e){}
 }
-
-const savedTheme = localStorage.getItem('ua-translit-theme');
-if(savedTheme === 'light' || savedTheme === 'dark') {
-  setTheme(savedTheme);
-} else {
-  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  setTheme(prefersLight ? 'light' : 'dark');
-}
+const savedTheme=localStorage.getItem('ua-translit-theme');
+if(savedTheme==='light'||savedTheme==='dark') setTheme(savedTheme);
+else setTheme('light');
 
 function saveUndo(v){
   const last=undoStack.length?undoStack[undoStack.length-1]:'';
-  if(last!==v){undoStack.push(v);if(undoStack.length>20)undoStack.shift();}
+  if(last!==v){undoStack.push(v);if(undoStack.length>100)undoStack.shift();}
 }
-
 function updateCount(){document.getElementById('ccount').textContent=ta.value.length;}
 
+/* LanguageTool live check */
+let ltMatches=[];
+let ltTimer=null;
+let ltIgnored=new Set();
+
+function getLang(){
+  return /[а-яіїєґА-ЯІЇЄҐ]/.test(ta.value)?'uk':'en-US';
+}
+function setStatus(state,msg){
+  const dot=document.getElementById('grammar-dot');
+  const txt=document.getElementById('grammar-msg');
+  dot.className='grammar-dot'+(state?' '+state:'');
+  txt.textContent=msg;
+}
+function scheduleCheck(){
+  clearTimeout(ltTimer);
+  const text=ta.value.trim();
+  if(!text){ltMatches=[];renderOverlay();setStatus('','grammar check ready');return;}
+  setStatus('checking','checking...');
+  ltTimer=setTimeout(()=>runCheck(ta.value),900);
+}
+async function runCheck(text){
+  const lang=getLang();
+  try{
+    const params=new URLSearchParams({text,language:lang,enabledOnly:'false'});
+    const res=await fetch('https://api.languagetool.org/v2/check',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:params});
+    const data=await res.json();
+    if(ta.value!==text)return;
+    ltMatches=(data.matches||[]).filter(m=>!ltIgnored.has(matchKey(m)));
+    renderOverlay();
+    const n=ltMatches.length;
+    if(n===0) setStatus('clean','no issues found');
+    else setStatus('errors',n+' issue'+(n>1?'s':'')+' found · click word to fix');
+  }catch(e){
+    setStatus('','languagetool unavailable');
+  }
+}
+function matchKey(m){return m.offset+':'+m.length+':'+m.message;}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderOverlay(){
+  const text=ta.value;
+  if(!ltMatches.length){overlay.innerHTML='';return;}
+  const sorted=[...ltMatches].sort((a,b)=>a.offset-b.offset);
+  let html='';
+  let cursor=0;
+  for(const m of sorted){
+    if(m.offset<cursor)continue;
+    html+=escHtml(text.slice(cursor,m.offset));
+    const word=text.slice(m.offset,m.offset+m.length);
+    const key=encodeURIComponent(matchKey(m));
+    html+='<span class="lt-error" onclick="openDropdown(event, \''+key+'\')">'+escHtml(word)+'</span>';
+    cursor=m.offset+m.length;
+  }
+  html+=escHtml(text.slice(cursor));
+  overlay.innerHTML=html;
+  syncScroll();
+}
+function syncScroll(){overlay.scrollTop=ta.scrollTop;overlay.scrollLeft=ta.scrollLeft;}
+ta.addEventListener('scroll',syncScroll);
+
+/* Context Dropdown */
+const dropdown=document.getElementById('lt-dropdown');
+let currentMatchKey=null;
+
+function openDropdown(e, key){
+  e.stopPropagation();
+  const match=ltMatches.find(m=>matchKey(m)===decodeURIComponent(key));
+  if(!match)return;
+  
+  currentMatchKey=matchKey(match);
+  dropdown.innerHTML='';
+  
+  const sugs=(match.replacements||[]).slice(0,6);
+  if(!sugs.length){
+    const empty=document.createElement('div');
+    empty.className='lt-drop-empty';
+    empty.textContent='No suggestions';
+    dropdown.appendChild(empty);
+  } else {
+    sugs.forEach(r=>{
+      const btn=document.createElement('button');
+      btn.className='lt-drop-item';
+      btn.textContent=r.value;
+      btn.onclick=(evt)=>{
+        evt.stopPropagation();
+        applySuggestion(match, r.value);
+      };
+      dropdown.appendChild(btn);
+    });
+  }
+  
+  const ignoreBtn=document.createElement('button');
+  ignoreBtn.className='lt-drop-item lt-drop-ignore';
+  ignoreBtn.textContent='Ignore';
+  ignoreBtn.onclick=(evt)=>{
+    evt.stopPropagation();
+    ignoreMatch(match);
+  };
+  dropdown.appendChild(ignoreBtn);
+  
+  dropdown.style.display='block';
+  
+  const targetRect=e.currentTarget.getBoundingClientRect();
+  const topPosition=targetRect.bottom+window.scrollY;
+  const leftPosition=targetRect.left+window.scrollX;
+  
+  dropdown.style.top=topPosition+'px';
+  dropdown.style.left=leftPosition+'px';
+  
+  const dropRect=dropdown.getBoundingClientRect();
+  if(dropRect.right>window.innerWidth-16){
+    dropdown.style.left=(window.innerWidth-dropRect.width-16)+'px';
+  }
+}
+
+function closeDropdown(){
+  dropdown.style.display='none';
+  currentMatchKey=null;
+}
+
+function ignoreMatch(match){
+  ltIgnored.add(matchKey(match));
+  ltMatches=ltMatches.filter(m=>matchKey(m)!==matchKey(match));
+  renderOverlay();
+  const n=ltMatches.length;
+  if(n===0) setStatus('clean','no issues found');
+  else setStatus('errors',n+' issue'+(n>1?'s':'')+' found · click word to fix');
+  closeDropdown();
+  ta.focus();
+}
+
+function applySuggestion(match,value){
+  const before=ta.value.slice(0,match.offset);
+  const after=ta.value.slice(match.offset+match.length);
+  const nv=before+value+after;
+  saveUndo(ta.value);
+  ta.value=nv;
+  updateCount();
+  closeDropdown();
+  ltIgnored.add(matchKey(match));
+  ltMatches=ltMatches.filter(m=>matchKey(m)!==matchKey(match));
+  renderOverlay();
+  const n=ltMatches.length;
+  if(n===0) setStatus('clean','no issues found');
+  else setStatus('errors',n+' issue'+(n>1?'s':'')+' found · click word to fix');
+  scheduleCheck();
+  requestAnimationFrame(()=>{
+    const pos=before.length+value.length;
+    ta.setSelectionRange(pos,pos);
+    ta.focus();
+  });
+}
+document.addEventListener('click',e=>{if(!dropdown.contains(e.target))closeDropdown();});
+
+/* Keyboard */
 ta.addEventListener('keydown',e=>{
   if(e.key==='Escape'||e.key==='F12'){e.preventDefault();setMode(mode==='lat2cyr'?'cyr2lat':'lat2cyr');return;}
   if(e.ctrlKey&&e.key==='z'){
     e.preventDefault();
-    if(undoStack.length>1){undoStack.pop();const p=undoStack[undoStack.length-1]??'';ta.value=p;updateCount();}
+    if(undoStack.length>1){undoStack.pop();const p=undoStack[undoStack.length-1]??'';ta.value=p;updateCount();renderOverlay();scheduleCheck();}
     return;
   }
 });
-
 ta.addEventListener('keypress',e=>{
   if(e.ctrlKey||e.altKey||e.metaKey)return;
   const code=e.which||e.charCode||e.keyCode;
@@ -283,34 +474,37 @@ ta.addEventListener('keypress',e=>{
   ta.value=newVal;
   updateCount();
   saveUndo(newVal);
+  closeDropdown();
   requestAnimationFrame(()=>ta.setSelectionRange(result.length,result.length));
+  scheduleCheck();
 });
+ta.addEventListener('input',()=>{updateCount();saveUndo(ta.value);closeDropdown();scheduleCheck();});
 
-ta.addEventListener('input',()=>{updateCount();saveUndo(ta.value);});
-
+/* Actions */
 function convertAll(toMode){
   const p1=ta.selectionStart,p2=ta.selectionEnd,hasSel=p1!==p2;
   const src=hasSel?ta.value.slice(p1,p2):ta.value;
   const conv=toMode==='cyr2lat'?transStr1(src):transStr2(src);
   const nv=hasSel?ta.value.slice(0,p1)+conv+ta.value.slice(p2):conv;
   ta.value=nv;updateCount();saveUndo(nv);ta.focus();
+  closeDropdown();
+  ltIgnored.clear();scheduleCheck();
 }
-
 function insertChar(cyr){
   const p1=ta.selectionStart??ta.value.length;
   const nv=ta.value.slice(0,p1)+cyr+ta.value.slice(ta.selectionEnd??p1);
   ta.value=nv;updateCount();saveUndo(nv);
+  closeDropdown();
   requestAnimationFrame(()=>{ta.setSelectionRange(p1+cyr.length,p1+cyr.length);ta.focus();});
+  scheduleCheck();
 }
-
 async function copyText(){
   try{await navigator.clipboard.writeText(ta.value);}
   catch{ta.select();document.execCommand('copy');}
   const t=document.getElementById('toast');
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1700);
 }
-
-function clearText(){saveUndo(ta.value);ta.value='';updateCount();ta.focus();}
+function clearText(){saveUndo(ta.value);ta.value='';updateCount();ltMatches=[];ltIgnored.clear();renderOverlay();closeDropdown();setStatus('','grammar check ready');ta.focus();}
 
 ta.focus();
 </script>
