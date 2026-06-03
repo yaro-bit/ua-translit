@@ -1,54 +1,27 @@
-# UA translit
+# UA Translit
 
-A high-performance, client-side Ukrainian transliterator designed as a privacy-first, zero-dependency alternative to legacy tools like translit.ru.
+A fast, lightweight web application for bidirectional Ukrainian-Latin transliteration. It operates directly inside the browser providing an intuitive environment for real-time text transformation.
 
-Unlike traditional services that rely on server-side processing and tracking scripts, UAtranslit runs entirely in the browser, ensuring complete data sovereignty and sub-millisecond conversion latency.
+---
 
 ## Key Features
 
-* **Bidirectional Real-Time Conversion:** Seamless typing conversion for both Latin to Ukrainian and Ukrainian to Latin modes.
-* **Privacy by Design:** 100% client-side execution. No analytics, no external APIs, no data leaks.
-* **Legacy Replacement:** Replaces outdated web tools with a modern, high-contrast, accessible developer-grade UI.
-* **Intuitive Digraph Handling:** Smart buffer logic to parse complex phonetic mappings (e.g., sh to ш, shh to щ, g' to ґ).
-* **Keyboard-First Workflow:** Fast mode toggling via Esc and local undo stack management (Ctrl + Z).
-* **Ultra-Lightweight Stack:** Zero external runtime dependencies. Zero infrastructure footprint.
+* **Real-Time Bidirectional Typing:** Instantly converts Latin to Ukrainian Cyrillic or Ukrainian Cyrillic to Latin as you type.
+* **Smart Digraph Parsing:** Automatically handles multi-character phonetic sequences (e.g., typing `sh` outputs `ш`, `shh` outputs `щ`, and `g'` outputs `ґ`).
+* **Integrated Grammar Checking:** Includes an on-demand, chunk-based grammar and spell-checking overlay powered by the external LanguageTool API.
+* **Keyboard-Optimized Workflow:** Supports native browser behavior, a custom multi-step undo stack via `Ctrl + Z`, and quick dropdown dismissal via `Escape`.
+* **Responsive Dual-Theming:** Features a clean, high-contrast interface with Light and Dark modes that automatically adapt to system preferences.
+* **Character Matrix Guide:** Displays an interactive reference sidebar mapping layout combinations for quick lookup and manual character insertion.
 
 ---
 
-## Architecture and Technical Specifications
+## Architecture & Technical Design
 
-The application is built using an ephemeral state-machine pattern for real-time text transformation.
+### Input Capture Engine
+Intercepts input mutations via the DOM `input` event. It uses state tables (`tra` and `abc2`) to evaluate character buffers and modify values before rendering, preventing cursor position drift.
 
-### Core Mapping Engine
-The translation engine uses structured character-buffer mapping (tra and abc2 tables) to dynamically intercept and mutate keystrokes before they commit to the DOM. This eliminates input lag and prevents caret-position drift during multi-character digraph translations.
+### UI Hierarchy & Layout
+Built using standard CSS Custom Properties for unified theme variables, structured via CSS Grid and Flexbox for cross-platform responsiveness.
 
-### Layout and UI Layer
-* **Typography:** Google Fonts integration (DM Mono) optimized for cryptographic/monospace clarity.
-* **Theming:** Native CSS Custom Properties (--bg-main, --bg-surface, etc.) implementing standard dark/light mode states coupled with window.matchMedia hardware-level querying for system defaults.
-* **Hardware Acceleration:** Key visual transitions use decoupled hardware-accelerated transforms (transform: scale(), opacity) via the composite layer to eliminate layout thrashing.
-
----
-
-## Transliteration Rule Engine
-
-| Latin Input | Cyrillic Output | Context / Notes |
-| :--- | :--- | :--- |
-| s | **с** | Standard mapping |
-| sh | **ш** | Automatic digraph resolution |
-| shh / q | **щ** | Extended digraph / shorthand constraint |
-| g' | **ґ** | Explicit modifier key assignment |
-| i' | **ї** | Explicit modifier key assignment |
-| zh | **ж** | Multi-character buffering |
-| ch | **ч** | Multi-character buffering |
-| + | **-** | Explicit digraph separator (escapes automatic joining) |
-
----
-
-## Deployment and Installation
-
-Because the application is strictly contained within a single `index.html` file, deployment requires no build step, no npm overhead, and no containerization.
-
-### Local Execution
-1. Clone the repository:
-```bash
-   git clone [https://github.com/your-username/ua-translit.git](https://github.com/your-username/ua-translit.git)
+### Font Stack
+Utilizes standard, system-level monospace font stacks (`SF Mono`, `Consolas`, `Menlo`) to guarantee deterministic rendering and precise alignment between the text area and the error markup overlay.
