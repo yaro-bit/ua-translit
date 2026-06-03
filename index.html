@@ -1,13 +1,19 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
+
+<!-- Client-side Privacy Headers (Requires server-side mirroring for full efficacy) -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <title>Ukrainian Transliterator</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
-
+/* Asset Isolation: Google Fonts removed. Native System UI fonts utilized. */
 :root {
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
@@ -24,8 +30,8 @@
   --accent-warning: #eab308;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 [data-theme="dark"] {
@@ -56,349 +62,69 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header */
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
-  height: 64px;
-  background-color: var(--bg-surface);
-  border-bottom: 1px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 24px; height: 64px; background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50;
 }
 
-.brand {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 1.125rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.brand { font-family: var(--font-mono); font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; gap: 8px; }
+.brand-badge { background-color: var(--accent-warning); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+.controls { display: flex; gap: 16px; }
+.segmented-control { display: flex; background-color: var(--bg-control); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
+.segment-btn { background: transparent; border: none; padding: 6px 12px; border-radius: 4px; color: var(--text-secondary); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.segment-btn.active { background-color: var(--bg-surface); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 
-.brand-badge {
-  background-color: var(--accent-warning);
-  color: #000;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
+.app-main { display: grid; grid-template-columns: 1fr 340px; gap: 24px; padding: 24px; max-width: 1600px; margin: 0 auto; width: 100%; flex-grow: 1; }
+@media (max-width: 1024px) { .app-main { grid-template-columns: 1fr; } }
 
-.controls {
-  display: flex;
-  gap: 16px;
-}
+.editor-panel { display: flex; flex-direction: column; background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: var(--shadow-sm); overflow: hidden; }
+.editor-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border-color); background-color: var(--bg-control); }
+.toolbar-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.cheatsheet { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); }
+.cheatsheet kbd { background-color: var(--bg-surface); border: 1px solid var(--border-color); padding: 2px 4px; border-radius: 4px; margin: 0 2px; }
 
-.segmented-control {
-  display: flex;
-  background-color: var(--bg-control);
-  padding: 4px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-}
-
-.segment-btn {
-  background: transparent;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  color: var(--text-secondary);
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.segment-btn.active {
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Main Layout */
-.app-main {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
-  padding: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
-  width: 100%;
-  flex-grow: 1;
-}
-
-@media (max-width: 1024px) {
-  .app-main { grid-template-columns: 1fr; }
-}
-
-/* Editor Panel */
-.editor-panel {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-.editor-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--bg-control);
-}
-
-.toolbar-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
-.cheatsheet {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.cheatsheet kbd {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  padding: 2px 4px;
-  border-radius: 4px;
-  margin: 0 2px;
-}
-
-.editor-container {
-  position: relative;
-  flex-grow: 1;
-  min-height: 500px;
-}
-
-.editor-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-  font-family: var(--font-mono);
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  box-sizing: border-box;
-}
-
-#ta {
-  background: transparent;
-  color: var(--text-primary);
-  border: none;
-  resize: none;
-  outline: none;
-  z-index: 10;
-}
-
+.editor-container { position: relative; flex-grow: 1; min-height: 500px; }
+.editor-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 24px; font-family: var(--font-mono); font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; box-sizing: border-box; }
+#ta { background: transparent; color: var(--text-primary); border: none; resize: none; outline: none; z-index: 10; }
 #ta::placeholder { color: var(--text-muted); }
+#lt-overlay { color: transparent; pointer-events: none; z-index: 5; overflow: hidden; }
+.lt-error { text-decoration: underline wavy var(--accent-danger); text-decoration-skip-ink: none; pointer-events: none; }
 
-#lt-overlay {
-  color: transparent;
-  pointer-events: none;
-  z-index: 5;
-  overflow: hidden;
-}
-
-.lt-error {
-  text-decoration: underline wavy var(--accent-danger);
-  text-decoration-skip-ink: none;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.editor-statusbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-surface);
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-}
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--text-muted);
-}
+.editor-statusbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--border-color); background-color: var(--bg-surface); font-size: 0.8125rem; color: var(--text-secondary); }
+.status-indicator { display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-muted); }
 .status-dot.checking { background-color: var(--accent-warning); animation: pulse 1s infinite; }
 .status-dot.errors { background-color: var(--accent-danger); }
 .status-dot.clean { background-color: var(--accent-success); }
-
 @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-.editor-actions {
-  display: flex;
-  gap: 8px;
-  padding: 16px;
-  background-color: var(--bg-control);
-  border-top: 1px solid var(--border-color);
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background-color: var(--accent-primary);
-  color: #fff;
-}
+.editor-actions { display: flex; gap: 8px; padding: 16px; background-color: var(--bg-control); border-top: 1px solid var(--border-color); flex-wrap: wrap; }
+.btn { padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.btn-primary { background-color: var(--accent-primary); color: #fff; }
 .btn-primary:hover { background-color: var(--accent-primary-hover); }
-
-.btn-secondary {
-  background-color: var(--bg-surface);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
+.btn-secondary { background-color: var(--bg-surface); border-color: var(--border-color); color: var(--text-primary); }
 .btn-secondary:hover { background-color: var(--bg-control); }
-
 .btn-spacer { margin-left: auto; }
 
-/* Sidebar */
-.sidebar {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
+.sidebar { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
+.sidebar-header { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; overflow-y: auto; }
+.char-cell { background-color: var(--bg-control); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer; user-select: none; transition: all 0.1s; }
+.char-cell:hover { border-color: var(--accent-primary); transform: translateY(-1px); }
+.char-sub { display: block; font-size: 0.6875rem; color: var(--text-secondary); font-family: var(--font-mono); margin-bottom: 4px; }
+.char-main { display: block; font-size: 1.125rem; font-weight: 500; color: var(--text-primary); }
 
-.sidebar-header {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-}
-
-.char-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
-  gap: 8px;
-  overflow-y: auto;
-}
-
-.char-cell {
-  background-color: var(--bg-control);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.1s;
-}
-
-.char-cell:hover {
-  border-color: var(--accent-primary);
-  transform: translateY(-1px);
-}
-
-.char-sub {
-  display: block;
-  font-size: 0.6875rem;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  margin-bottom: 4px;
-}
-
-.char-main {
-  display: block;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-/* Dropdown */
-#lt-dropdown {
-  position: absolute;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  z-index: 1000;
-  display: none;
-  min-width: 180px;
-  padding: 8px 0;
-}
-
-.drop-item {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  cursor: pointer;
-}
+#lt-dropdown { position: fixed; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow-md); z-index: 1000; display: none; min-width: 180px; padding: 8px 0; }
+.drop-item { width: 100%; text-align: left; background: none; border: none; padding: 8px 16px; font-size: 0.875rem; color: var(--text-primary); cursor: pointer; }
 .drop-item:hover { background-color: var(--bg-control); }
 .drop-item.ignore { border-top: 1px solid var(--border-color); color: var(--text-muted); }
 .drop-item.ignore:hover { color: var(--accent-danger); }
 
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background-color: var(--text-primary);
-  color: var(--bg-surface);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s;
-  pointer-events: none;
-  z-index: 9999;
-}
+.toast { position: fixed; bottom: 24px; right: 24px; background-color: var(--text-primary); color: var(--bg-surface); padding: 12px 24px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 9999; }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-/* Footer */
-.app-footer {
-  border-top: 1px solid var(--border-color);
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  background-color: var(--bg-surface);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
+.app-footer { border-top: 1px solid var(--border-color); padding: 16px 24px; display: flex; justify-content: space-between; background-color: var(--bg-surface); font-size: 0.75rem; color: var(--text-muted); }
 .app-footer a { color: var(--text-secondary); text-decoration: none; }
 .app-footer a:hover { color: var(--text-primary); }
 </style>
@@ -436,16 +162,17 @@ body {
     <div class="editor-statusbar">
       <div class="status-indicator">
         <div class="status-dot" id="grammar-dot"></div>
-        <span id="grammar-msg">Grammar Engine Idle</span>
+        <span id="grammar-msg">correction standby</span>
       </div>
       <div><span id="ccount" style="font-family: var(--font-mono)">0</span> bytes</div>
     </div>
 
     <div class="editor-actions">
-      <button class="btn btn-primary" onclick="convertAll('lat2cyr')">Force Cyrillic</button>
-      <button class="btn btn-primary" onclick="convertAll('cyr2lat')">Force Latin</button>
-      <button class="btn btn-secondary btn-spacer" onclick="copyText()">Copy Pipeline</button>
-      <button class="btn btn-secondary" onclick="clearText()">Flush Buffer</button>
+      <button class="btn btn-primary" onclick="convertAll('lat2cyr')">To Cyrillic</button>
+      <button class="btn btn-primary" onclick="convertAll('cyr2lat')">To Latin</button>
+      <button class="btn btn-secondary" onclick="triggerGrammarCheck()">Grammar Check</button>
+      <button class="btn btn-secondary btn-spacer" onclick="copyText()">Copy</button>
+      <button class="btn btn-secondary" onclick="clearText()">Flush</button>
     </div>
   </section>
 
@@ -466,10 +193,17 @@ body {
 <div class="toast" id="toast">Pipeline buffer copied successfully.</div>
 
 <script>
-// Logic preserved natively to prevent architectural regressions during UI refactor.
-const STORAGE_KEY = 'ua-translit-theme';
+'use strict';
 
-const tra = {}, abc2 = {}, abc1 = {};
+const tra = {}, abc2 = {}, abc1 = {
+  'а':'a','б':'b','в':'v','г':'g','ґ':"g'",'д':'d','е':'e','є':'je','ж':'zh','з':'z','и':'y','і':'i','ї':"i'",
+  'й':'j','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h',
+  'ц':'c','ч':'ch','ш':'sh','щ':'shh','ь':"'",'ю':'ju','я':'ja',
+  'А':'A','Б':'B','В':'V','Г':'G','Ґ':"G'",'Д':'D','Е':'E','Є':'Je','Ж':'Zh','З':'Z','И':'Y','І':'I','Ї':"I'",
+  'Й':'J','К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'H',
+  'Ц':'C','Ч':'Ch','Ш':'Sh','Щ':'Shh','Ь':"''",'Ю':'Ju','Я':'Ja'
+};
+
 tra['a']=['й+','и+','Й+','И+','й','и','Й','И','','']; abc2['a']=['йа','иа','Йа','Иа','я','я','Я','Я','а','a'];
 tra['b']=['','']; abc2['b']=['б','b'];
 tra['v']=['','']; abc2['v']=['в','v'];
@@ -500,7 +234,6 @@ tra['c']=['','']; abc2['c']=['ц','c'];
 tra['w']=['','']; abc2['w']=['ш','w'];
 tra['q']=['','']; abc2['q']=['щ','q'];
 tra['ü']=['','']; abc2['ü']=['ю','ü'];
-
 tra['A']=['Й+','И+','Й','И','','']; abc2['A']=['ЙА','ИА','Я','Я','А','A'];
 tra['B']=['','']; abc2['B']=['Б','B'];
 tra['V']=['','']; abc2['V']=['В','V'];
@@ -530,19 +263,7 @@ tra['W']=['','']; abc2['W']=['Ш','W'];
 tra['Q']=['','']; abc2['Q']=['Щ','Q'];
 tra['Ü']=['','']; abc2['Ü']=['Ю','Ü'];
 
-'а б в г ґ д е є ж з и і ї й к л м н о п р с т у ф х ц ч ш щ ь ю я А Б В Г Ґ Д Е Є Ж З И І Ї Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ь Ю Я'.split(' ').forEach(c => {
-  const m = {
-    'а':'a','б':'b','в':'v','г':'g','ґ':"g'","д":"d",'е':'e','є':'je','ж':'zh','з':'z','и':'y','і':'i','ї':"i'",
-    'й':'j','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h',
-    'ц':'c','ч':'ch','ш':'sh','щ':'shh','ь':"'",'ю':'ju','я':'ja',
-    'А':'A','Б':'B','В':'V','Г':'G','Ґ':"G'","Д":"D",'Е':'E','Є':'Je','Ж':'Zh','З':'Z','И':'Y','І':'I','Ї':"I'",
-    'Й':'J','К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'H',
-    'Ц':'C','Ч':'Ch','Ш':'Sh','Щ':'Shh','Ь':"''",'Ю':'Ju','Я':'Ja'
-  };
-  if (m[c]) abc1[c] = m[c];
-});
-
-function transSym2(txt){
+function transSym2(txt) {
   const pre = txt.slice(0, -1), last = txt.slice(-1);
   const lat = tra[last], rus = abc2[last];
   if (lat) {
@@ -553,9 +274,9 @@ function transSym2(txt){
   }
   return txt;
 }
-function transStr2(s){ let o = ''; for (let i = 0; i < s.length; i++) o = transSym2(o + s[i]); return o; }
-function transSym1(s){ return abc1[s] !== undefined ? abc1[s] : s; }
-function transStr1(s){ let o = ''; for (let i = 0; i < s.length; i++) o += transSym1(s[i]); return o; }
+function transStr2(s) { let o = ''; for (let i = 0; i < s.length; i++) o = transSym2(o + s[i]); return o; }
+function transSym1(s) { return abc1[s] !== undefined ? abc1[s] : s; }
+function transStr1(s) { let o = ''; for (let i = 0; i < s.length; i++) o += transSym1(s[i]); return o; }
 
 const CHARS = [
   ['a','а'],['b','б'],['v','в'],['g','г'],["g'",'ґ'],['d','д'],['e','е'],['je/ö','є'],
@@ -564,43 +285,41 @@ const CHARS = [
   ['f','ф'],['h/x','х'],['c','ц'],['ch','ч'],['sh/w','ш'],['shh/q','щ'],["'",'ь'],['ju/ü','ю'],['ja','я']
 ];
 
-let mode = 'lat2cyr';
-let ltMatches = [];
-let ltTimer = null;
-let ltIgnored = new Set();
-const undoStack = [];
-const ta = document.getElementById('ta');
-const overlay = document.getElementById('lt-overlay');
+const ta       = document.getElementById('ta');
+const overlay  = document.getElementById('lt-overlay');
 const dropdown = document.getElementById('lt-dropdown');
 
-function safeStorageGet(key, fallback) {
-  try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
-}
-function safeStorageSet(key, value) {
-  try { localStorage.setItem(key, value); } catch (e) {}
-}
+let mode            = 'lat2cyr';
+let ltMatches       = [];
+let renderedMatches = [];
+let ltIgnored       = new Set();
+let ltAbort         = null;
+let lastCheckedText = null;
+let dropdownJustOpened = false;
+const undoStack     = [];
+const STORAGE_KEY   = 'ua-translit-theme';
+
+function storageGet(key, fallback) { try { return localStorage.getItem(key) || fallback; } catch { return fallback; } }
+function storageSet(key, val) { try { localStorage.setItem(key, val); } catch {} }
 
 function setTheme(t) {
   document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
-  document.getElementById('theme-dark').className = 'segment-btn' + (t === 'dark' ? ' active' : '');
+  document.getElementById('theme-dark').className  = 'segment-btn' + (t === 'dark'  ? ' active' : '');
   document.getElementById('theme-light').className = 'segment-btn' + (t === 'light' ? ' active' : '');
-  safeStorageSet(STORAGE_KEY, t);
+  storageSet(STORAGE_KEY, t);
 }
-
-function initTheme() {
-  const savedTheme = safeStorageGet(STORAGE_KEY, 'dark');
-  setTheme(savedTheme);
-}
+function initTheme() { setTheme(storageGet(STORAGE_KEY, 'light')); }
 
 function renderCharMap() {
   const grid = document.getElementById('char-grid');
   grid.innerHTML = '';
+  const isLat = mode === 'lat2cyr';
   CHARS.forEach(([lat, cyr]) => {
     const cell = document.createElement('div');
     cell.className = 'char-cell';
-    const isLatMode = mode === 'lat2cyr';
-    cell.innerHTML = `<span class="char-sub">${isLatMode ? lat : cyr}</span><span class="char-main">${isLatMode ? cyr : lat}</span>`;
-    cell.addEventListener('click', () => insertChar(isLatMode ? cyr : lat));
+    cell.innerHTML = '<span class="char-sub">' + (isLat ? lat : cyr) + '</span>' +
+                     '<span class="char-main">' + (isLat ? cyr : lat) + '</span>';
+    cell.addEventListener('click', () => insertChar(isLat ? cyr : lat));
     grid.appendChild(cell);
   });
 }
@@ -612,86 +331,84 @@ function setMode(m) {
   document.getElementById('editor-lbl').textContent = m === 'lat2cyr' ? 'Input Buffer (Latin)' : 'Input Buffer (Cyrillic)';
   ta.placeholder = m === 'lat2cyr' ? 'Pryvit, svite...' : 'Привіт, світе...';
   renderCharMap();
-  ta.focus();
   closeDropdown();
-  scheduleCheck();
+  resetGrammarState();
+  ta.focus();
 }
 
 function saveUndo(v) {
   const last = undoStack.length ? undoStack[undoStack.length - 1] : '';
-  if (last !== v) {
-    undoStack.push(v);
-    if (undoStack.length > 100) undoStack.shift();
-  }
+  if (last !== v) { undoStack.push(v); if (undoStack.length > 100) undoStack.shift(); }
 }
 
-function updateCount() {
-  document.getElementById('ccount').textContent = ta.value.length;
-}
-
+function updateCount() { document.getElementById('ccount').textContent = ta.value.length; }
 function setStatus(state, msg) {
-  const dot = document.getElementById('grammar-dot');
-  const txt = document.getElementById('grammar-msg');
-  dot.className = 'status-dot' + (state ? ' ' + state : '');
-  txt.textContent = msg;
+  document.getElementById('grammar-dot').className = 'status-dot' + (state ? ' ' + state : '');
+  document.getElementById('grammar-msg').textContent = msg;
 }
 
-function scheduleCheck() {
-  clearTimeout(ltTimer);
+function getLang() { return /[а-яіїєґА-ЯІЇЄҐ]/.test(ta.value) ? 'uk' : 'en-US'; }
+
+function resetGrammarState() {
+  setStatus('', 'correction standby');
+  ltMatches = []; renderedMatches = [];
+  renderOverlay();
+}
+
+function triggerGrammarCheck() {
   const text = ta.value.trim();
   if (!text) {
-    ltMatches = [];
-    renderOverlay();
-    setStatus('', 'Grammar Engine Idle');
+    resetGrammarState();
     return;
   }
   setStatus('checking', 'Processing...');
-  ltTimer = setTimeout(() => runCheck(ta.value), 900);
-}
-
-function getLang() {
-  return /[а-яіїєґА-ЯІЇЄҐ]/.test(ta.value) ? 'uk' : 'en-US';
+  runCheck(text);
 }
 
 async function runCheck(text) {
-  const lang = getLang();
+  if (text === lastCheckedText) return;
+  if (ltAbort) ltAbort.abort();
+  ltAbort = new AbortController();
   try {
-    const params = new URLSearchParams({ text, language: lang, enabledOnly: 'false' });
+    const params = new URLSearchParams({ text, language: getLang(), enabledOnly: 'false' });
     const res = await fetch('https://api.languagetool.org/v2/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params
+      body: params,
+      signal: ltAbort.signal,
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer'
     });
     const data = await res.json();
     if (ta.value !== text) return;
+    lastCheckedText = text;
     ltMatches = (data.matches || []).filter(m => !ltIgnored.has(matchKey(m)));
     renderOverlay();
     const n = ltMatches.length;
-    if (n === 0) setStatus('clean', '0 Anomalies Detected');
-    else setStatus('errors', `${n} Anomalies Detected`);
+    setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies Detected' : n + ' Anomalies Detected');
   } catch (e) {
+    if (e.name === 'AbortError') return;
     setStatus('', 'API Unreachable');
   }
 }
 
 function matchKey(m) { return m.offset + ':' + m.length + ':' + m.message; }
-function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function escHtml(s)  { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function renderOverlay() {
-  const text = ta.value;
-  if (!ltMatches.length) {
-    overlay.innerHTML = '';
-    return;
-  }
+  if (!ltMatches.length) { overlay.innerHTML = ''; renderedMatches = []; return; }
+  const text   = ta.value;
   const sorted = [...ltMatches].sort((a, b) => a.offset - b.offset);
-  let html = '';
+  renderedMatches = [];
+  let html   = '';
   let cursor = 0;
   for (const m of sorted) {
     if (m.offset < cursor) continue;
     html += escHtml(text.slice(cursor, m.offset));
-    const word = text.slice(m.offset, m.offset + m.length);
-    const key = encodeURIComponent(matchKey(m));
-    html += `<span class="lt-error" onclick="openDropdown(event, '${key}')">${escHtml(word)}</span>`;
+    const idx = renderedMatches.length;
+    renderedMatches.push(m);
+    html += '<span class="lt-error" data-idx="' + idx + '">' +
+            escHtml(text.slice(m.offset, m.offset + m.length)) + '</span>';
     cursor = m.offset + m.length;
   }
   html += escHtml(text.slice(cursor));
@@ -699,86 +416,71 @@ function renderOverlay() {
   syncScroll();
 }
 
-function syncScroll() {
-  overlay.scrollTop = ta.scrollTop;
-  overlay.scrollLeft = ta.scrollLeft;
-}
+function syncScroll() { overlay.scrollTop = ta.scrollTop; overlay.scrollLeft = ta.scrollLeft; }
 ta.addEventListener('scroll', syncScroll);
 
-function openDropdown(e, key) {
-  e.stopPropagation();
-  const match = ltMatches.find(m => matchKey(m) === decodeURIComponent(key));
-  if (!match) return;
-
+function openDropdown(match, anchorRect) {
   dropdown.innerHTML = '';
   const sugs = (match.replacements || []).slice(0, 6);
-
-  if (!sugs.length) {
-    const empty = document.createElement('div');
-    empty.className = 'drop-item ignore';
-    empty.textContent = 'No modifications suggested';
-    dropdown.appendChild(empty);
-  } else {
+  if (sugs.length) {
     sugs.forEach(r => {
       const btn = document.createElement('button');
       btn.className = 'drop-item';
       btn.textContent = r.value;
-      btn.addEventListener('click', evt => {
-        evt.stopPropagation();
-        applySuggestion(match, r.value);
-      });
+      btn.addEventListener('mousedown', e => { e.preventDefault(); applySuggestion(match, r.value); });
       dropdown.appendChild(btn);
     });
+  } else {
+    const empty = document.createElement('div');
+    empty.className = 'drop-item ignore';
+    empty.textContent = 'No suggestions available';
+    dropdown.appendChild(empty);
   }
 
-  const ignoreBtn = document.createElement('button');
-  ignoreBtn.className = 'drop-item ignore';
-  ignoreBtn.textContent = 'Ignore Rule';
-  ignoreBtn.addEventListener('click', evt => {
-    evt.stopPropagation();
-    ignoreMatch(match);
-  });
-  dropdown.appendChild(ignoreBtn);
+  const sep = document.createElement('div');
+  sep.style.cssText = 'height:1px;background:var(--border-color);margin:4px 0';
+  dropdown.appendChild(sep);
+
+  const ign = document.createElement('button');
+  ign.className = 'drop-item ignore';
+  ign.textContent = 'Ignore';
+  ign.addEventListener('mousedown', e => { e.preventDefault(); ignoreMatch(match); });
+  dropdown.appendChild(ign);
 
   dropdown.style.display = 'block';
-  const targetRect = e.currentTarget.getBoundingClientRect();
-  dropdown.style.top = (targetRect.bottom + window.scrollY + 4) + 'px';
-  dropdown.style.left = (targetRect.left + window.scrollX) + 'px';
+  const dw = dropdown.offsetWidth  || 200;
+  const dh = dropdown.offsetHeight || 160;
+  let top  = anchorRect.bottom + 4;
+  let left = anchorRect.left;
+  if (top  + dh > window.innerHeight - 8) top  = anchorRect.top - dh - 4;
+  if (left + dw > window.innerWidth  - 8) left = window.innerWidth - dw - 8;
+  if (left < 8) left = 8;
+  dropdown.style.top  = top  + 'px';
+  dropdown.style.left = left + 'px';
+
+  dropdownJustOpened = true;
+  setTimeout(() => { dropdownJustOpened = false; }, 0);
 }
 
 function closeDropdown() { dropdown.style.display = 'none'; }
 
-function ignoreMatch(match) {
-  ltIgnored.add(matchKey(match));
-  ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
-  renderOverlay();
-  const n = ltMatches.length;
-  if (n === 0) setStatus('clean', '0 Anomalies Detected');
-  else setStatus('errors', `${n} Anomalies Detected`);
-  closeDropdown();
-  ta.focus();
-}
+ta.addEventListener('mouseup', () => {
+  const pos = ta.selectionStart;
+  let foundIdx = -1;
+  for (let i = 0; i < renderedMatches.length; i++) {
+    const m = renderedMatches[i];
+    if (pos >= m.offset && pos < m.offset + m.length) { foundIdx = i; break; }
+  }
+  if (foundIdx === -1) { closeDropdown(); return; }
+  const span = overlay.querySelector('.lt-error[data-idx="' + foundIdx + '"]');
+  const rect = span ? span.getBoundingClientRect() : ta.getBoundingClientRect();
+  openDropdown(renderedMatches[foundIdx], rect);
+});
 
-function applySuggestion(match, value) {
-  const before = ta.value.slice(0, match.offset);
-  const after = ta.value.slice(match.offset + match.length);
-  const nv = before + value + after;
-  saveUndo(ta.value);
-  ta.value = nv;
-  updateCount();
+document.addEventListener('click', () => {
+  if (dropdownJustOpened) return;
   closeDropdown();
-  ltIgnored.add(matchKey(match));
-  ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
-  renderOverlay();
-  scheduleCheck();
-  requestAnimationFrame(() => {
-    const pos = before.length + value.length;
-    ta.setSelectionRange(pos, pos);
-    ta.focus();
-  });
-}
-
-document.addEventListener('click', e => { if (!dropdown.contains(e.target)) closeDropdown(); });
+});
 
 ta.addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.preventDefault(); closeDropdown(); return; }
@@ -786,10 +488,10 @@ ta.addEventListener('keydown', e => {
     e.preventDefault();
     if (undoStack.length > 1) {
       undoStack.pop();
-      ta.value = undoStack[undoStack.length - 1] ?? '';
+      ta.value = undoStack[undoStack.length - 1] || '';
       updateCount();
-      renderOverlay();
-      scheduleCheck();
+      lastCheckedText = null;
+      resetGrammarState();
     }
   }
 });
@@ -799,66 +501,70 @@ ta.addEventListener('keypress', e => {
   const code = e.which || e.charCode || e.keyCode;
   if (!code || code <= 33) return;
   e.preventDefault();
-
-  const p1 = ta.selectionStart;
-  const b = ta.value.slice(0, p1);
-  const a = ta.value.slice(ta.selectionEnd);
-  const ch = String.fromCharCode(code);
+  const p1  = ta.selectionStart;
+  const b   = ta.value.slice(0, p1);
+  const a   = ta.value.slice(ta.selectionEnd);
+  const ch  = String.fromCharCode(code);
   const res = mode === 'cyr2lat' ? b + transSym1(ch) : transSym2(b + ch);
-
-  ta.value = res + a;
+  ta.value  = res + a;
   updateCount();
   saveUndo(ta.value);
   closeDropdown();
   requestAnimationFrame(() => ta.setSelectionRange(res.length, res.length));
-  scheduleCheck();
+  resetGrammarState();
 });
 
-ta.addEventListener('input', () => {
-  updateCount();
-  saveUndo(ta.value);
-  closeDropdown();
-  scheduleCheck();
-});
+ta.addEventListener('input', () => { updateCount(); saveUndo(ta.value); closeDropdown(); resetGrammarState(); });
 
 function convertAll(m) {
   const val = m === 'cyr2lat' ? transStr1(ta.value) : transStr2(ta.value);
-  saveUndo(ta.value);
-  ta.value = val;
-  updateCount();
-  scheduleCheck();
-  ta.focus();
+  saveUndo(ta.value); ta.value = val; updateCount();
+  lastCheckedText = null; resetGrammarState(); ta.focus();
 }
 
 function insertChar(c) {
-  const p = ta.selectionStart;
+  const p  = ta.selectionStart;
   const nv = ta.value.slice(0, p) + c + ta.value.slice(ta.selectionEnd);
-  saveUndo(ta.value);
-  ta.value = nv;
-  updateCount();
-  scheduleCheck();
-  requestAnimationFrame(() => ta.setSelectionRange(p + c.length, p + c.length));
-  ta.focus();
+  saveUndo(ta.value); ta.value = nv; updateCount(); resetGrammarState();
+  requestAnimationFrame(() => { ta.setSelectionRange(p + c.length, p + c.length); ta.focus(); });
 }
 
 async function copyText() {
-  try { await navigator.clipboard.writeText(ta.value); } 
+  try { await navigator.clipboard.writeText(ta.value); }
   catch { ta.select(); document.execCommand('copy'); }
   const t = document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1700);
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 1700);
 }
 
 function clearText() {
-  saveUndo(ta.value);
-  ta.value = '';
-  updateCount();
-  ltMatches = [];
-  ltIgnored.clear();
+  saveUndo(ta.value); ta.value = ''; updateCount();
+  ltMatches = []; renderedMatches = []; ltIgnored.clear(); lastCheckedText = null;
+  renderOverlay(); closeDropdown(); setStatus('', 'correction standby'); ta.focus();
+}
+
+function ignoreMatch(match) {
+  ltIgnored.add(matchKey(match));
+  ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
   renderOverlay();
-  closeDropdown();
-  setStatus('', 'Grammar Engine Idle');
-  ta.focus();
+  const n = ltMatches.length;
+  setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies Detected' : n + ' Anomalies Detected');
+  closeDropdown(); ta.focus();
+}
+
+function applySuggestion(match, value) {
+  const before = ta.value.slice(0, match.offset);
+  const after  = ta.value.slice(match.offset + match.length);
+  saveUndo(ta.value);
+  ta.value = before + value + after;
+  updateCount(); closeDropdown();
+  ltIgnored.add(matchKey(match));
+  ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
+  renderOverlay(); lastCheckedText = null; 
+  triggerGrammarCheck();
+  requestAnimationFrame(() => {
+    ta.setSelectionRange(before.length + value.length, before.length + value.length);
+    ta.focus();
+  });
 }
 
 initTheme();
