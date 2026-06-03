@@ -1,19 +1,14 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-
-<!-- Client-side Privacy Headers (Requires server-side mirroring for full efficacy) -->
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-
 <title>Ukrainian Transliterator</title>
 <style>
-/* Asset Isolation: Google Fonts removed. Native System UI fonts utilized. */
 :root {
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
@@ -30,8 +25,10 @@
   --accent-warning: #eab308;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
-  --font-mono: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  
+  /* Normalised, cross-platform deterministic monospace and sans font stacks */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
 }
 
 [data-theme="dark"] {
@@ -60,6 +57,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app-header {
@@ -69,10 +67,10 @@ body {
 }
 
 .brand { font-family: var(--font-mono); font-weight: 700; font-size: 1.125rem; display: flex; align-items: center; gap: 8px; }
-.brand-badge { background-color: var(--accent-warning); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+.brand-badge { background-color: var(--accent-warning); color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
 .controls { display: flex; gap: 16px; }
 .segmented-control { display: flex; background-color: var(--bg-control); padding: 4px; border-radius: 8px; border: 1px solid var(--border-color); }
-.segment-btn { background: transparent; border: none; padding: 6px 12px; border-radius: 4px; color: var(--text-secondary); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.segment-btn { background: transparent; border: none; padding: 6px 12px; border-radius: 4px; color: var(--text-secondary); font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 0.15s, color 0.15s; }
 .segment-btn.active { background-color: var(--bg-surface); color: var(--text-primary); box-shadow: var(--shadow-sm); }
 
 .app-main { display: grid; grid-template-columns: 1fr 340px; gap: 24px; padding: 24px; max-width: 1600px; margin: 0 auto; width: 100%; flex-grow: 1; }
@@ -84,11 +82,18 @@ body {
 .cheatsheet { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary); }
 .cheatsheet kbd { background-color: var(--bg-surface); border: 1px solid var(--border-color); padding: 2px 4px; border-radius: 4px; margin: 0 2px; }
 
-.editor-container { position: relative; flex-grow: 1; min-height: 500px; }
-.editor-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 24px; font-family: var(--font-mono); font-size: 0.9375rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; box-sizing: border-box; }
-#ta { background: transparent; color: var(--text-primary); border: none; resize: none; outline: none; z-index: 10; }
+.editor-container { position: relative; flex-grow: 1; min-height: 500px; background-color: transparent; }
+
+/* Normalised Typographic Metrics to align layers completely */
+.editor-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 24px;
+  font-family: var(--font-mono); font-size: 0.9375rem; line-height: 1.6;
+  white-space: pre-wrap; word-wrap: break-word; box-sizing: border-box;
+  margin: 0; border: none;
+}
+#ta { background: transparent; color: var(--text-primary); resize: none; outline: none; z-index: 10; }
 #ta::placeholder { color: var(--text-muted); }
-#lt-overlay { color: transparent; pointer-events: none; z-index: 5; overflow: hidden; }
+#lt-overlay { color: transparent; pointer-events: none; z-index: 5; overflow-y: auto; overflow-x: hidden; border: 1px solid transparent; }
 .lt-error { text-decoration: underline wavy var(--accent-danger); text-decoration-skip-ink: none; pointer-events: none; }
 
 .editor-statusbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--border-color); background-color: var(--bg-surface); font-size: 0.8125rem; color: var(--text-secondary); }
@@ -100,17 +105,17 @@ body {
 @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
 .editor-actions { display: flex; gap: 8px; padding: 16px; background-color: var(--bg-control); border-top: 1px solid var(--border-color); flex-wrap: wrap; }
-.btn { padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.btn { padding: 8px 16px; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: background-color 0.15s, border-color 0.15s; }
 .btn-primary { background-color: var(--accent-primary); color: #fff; }
 .btn-primary:hover { background-color: var(--accent-primary-hover); }
 .btn-secondary { background-color: var(--bg-surface); border-color: var(--border-color); color: var(--text-primary); }
 .btn-secondary:hover { background-color: var(--bg-control); }
 .btn-spacer { margin-left: auto; }
 
-.sidebar { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; }
+.sidebar { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; max-height: calc(100vh - 112px); position: sticky; top: 88px; }
 .sidebar-header { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; overflow-y: auto; }
-.char-cell { background-color: var(--bg-control); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer; user-select: none; transition: all 0.1s; }
+.char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; overflow-y: auto; padding-right: 4px; }
+.char-cell { background-color: var(--bg-control); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer; user-select: none; transition: border-color 0.15s, transform 0.15s; }
 .char-cell:hover { border-color: var(--accent-primary); transform: translateY(-1px); }
 .char-sub { display: block; font-size: 0.6875rem; color: var(--text-secondary); font-family: var(--font-mono); margin-bottom: 4px; }
 .char-main { display: block; font-size: 1.125rem; font-weight: 500; color: var(--text-primary); }
@@ -121,10 +126,10 @@ body {
 .drop-item.ignore { border-top: 1px solid var(--border-color); color: var(--text-muted); }
 .drop-item.ignore:hover { color: var(--accent-danger); }
 
-.toast { position: fixed; bottom: 24px; right: 24px; background-color: var(--text-primary); color: var(--bg-surface); padding: 12px 24px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 9999; }
+.toast { position: fixed; bottom: 24px; right: 24px; background-color: var(--text-primary); color: var(--bg-surface); padding: 12px 24px; border-radius: 8px; font-size: 0.875rem; font-weight: 500; opacity: 0; transform: translateY(10px); transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 9999; }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-.app-footer { border-top: 1px solid var(--border-color); padding: 16px 24px; display: flex; justify-content: space-between; background-color: var(--bg-surface); font-size: 0.75rem; color: var(--text-muted); }
+.app-footer { border-top: 1px solid var(--border-color); padding: 16px 24px; display: flex; justify-content: space-between; background-color: var(--bg-surface); font-size: 0.75rem; color: var(--text-muted); margin-top: auto; }
 .app-footer a { color: var(--text-secondary); text-decoration: none; }
 .app-footer a:hover { color: var(--text-primary); }
 </style>
@@ -164,7 +169,7 @@ body {
         <div class="status-dot" id="grammar-dot"></div>
         <span id="grammar-msg">correction standby</span>
       </div>
-      <div><span id="ccount" style="font-family: var(--font-mono)">0</span> bytes</div>
+      <div><span id="ccount" style="font-family: var(--font-mono)">0</span> characters</div>
     </div>
 
     <div class="editor-actions">
@@ -293,11 +298,10 @@ let mode            = 'lat2cyr';
 let ltMatches       = [];
 let renderedMatches = [];
 let ltIgnored       = new Set();
-let ltAbort         = null;
-let lastCheckedText = null;
-let dropdownJustOpened = false;
+let debounceTimer = null;
 const undoStack     = [];
 const STORAGE_KEY   = 'ua-translit-theme';
+const CHUNK_SIZE    = 400;
 
 function storageGet(key, fallback) { try { return localStorage.getItem(key) || fallback; } catch { return fallback; } }
 function storageSet(key, val) { try { localStorage.setItem(key, val); } catch {} }
@@ -308,7 +312,11 @@ function setTheme(t) {
   document.getElementById('theme-light').className = 'segment-btn' + (t === 'light' ? ' active' : '');
   storageSet(STORAGE_KEY, t);
 }
-function initTheme() { setTheme(storageGet(STORAGE_KEY, 'light')); }
+function initTheme() { 
+  const saved = storageGet(STORAGE_KEY, null);
+  if (saved) { setTheme(saved); }
+  else { setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+}
 
 function renderCharMap() {
   const grid = document.getElementById('char-grid');
@@ -317,8 +325,7 @@ function renderCharMap() {
   CHARS.forEach(([lat, cyr]) => {
     const cell = document.createElement('div');
     cell.className = 'char-cell';
-    cell.innerHTML = '<span class="char-sub">' + (isLat ? lat : cyr) + '</span>' +
-                     '<span class="char-main">' + (isLat ? cyr : lat) + '</span>';
+    cell.innerHTML = `<span class="char-sub">${isLat ? lat : cyr}</span><span class="char-main">${isLat ? cyr : lat}</span>`;
     cell.addEventListener('click', () => insertChar(isLat ? cyr : lat));
     grid.appendChild(cell);
   });
@@ -352,44 +359,47 @@ function getLang() { return /[а-яіїєґА-ЯІЇЄҐ]/.test(ta.value) ? 'uk'
 function resetGrammarState() {
   setStatus('', 'correction standby');
   ltMatches = []; renderedMatches = [];
-  renderOverlay();
+  overlay.innerHTML = '';
 }
 
 function triggerGrammarCheck() {
-  const text = ta.value.trim();
-  if (!text) {
-    resetGrammarState();
-    return;
-  }
-  setStatus('checking', 'Processing...');
-  runCheck(text);
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    const text = ta.value.trim();
+    if (!text) { resetGrammarState(); return; }
+    setStatus('checking', 'Processing chunks...');
+    const chunks = text.match(new RegExp(`.{1,${CHUNK_SIZE}}(\\s|$)`, 'g')) || [text];
+    processChunks(chunks);
+  }, 400);
 }
 
-async function runCheck(text) {
-  if (text === lastCheckedText) return;
-  if (ltAbort) ltAbort.abort();
-  ltAbort = new AbortController();
-  try {
-    const params = new URLSearchParams({ text, language: getLang(), enabledOnly: 'false' });
-    const res = await fetch('https://api.languagetool.org/v2/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params,
-      signal: ltAbort.signal,
-      credentials: 'omit',
-      referrerPolicy: 'no-referrer'
-    });
-    const data = await res.json();
-    if (ta.value !== text) return;
-    lastCheckedText = text;
-    ltMatches = (data.matches || []).filter(m => !ltIgnored.has(matchKey(m)));
-    renderOverlay();
-    const n = ltMatches.length;
-    setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies Detected' : n + ' Anomalies Detected');
-  } catch (e) {
-    if (e.name === 'AbortError') return;
-    setStatus('', 'API Unreachable');
+async function processChunks(chunks) {
+  let allMatches = [];
+  let currentOffset = 0;
+  
+  for (const chunk of chunks) {
+    try {
+      const params = new URLSearchParams({ text: chunk, language: getLang(), enabledOnly: 'false' });
+      const res = await fetch('https://api.languagetool.org/v2/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+      });
+      const data = await res.json();
+      if (data.matches) {
+        const adjusted = data.matches.map(m => ({ ...m, offset: m.offset + currentOffset }));
+        allMatches.push(...adjusted);
+      }
+      currentOffset += chunk.length;
+    } catch (e) {
+      console.error(e);
+    }
   }
+  
+  ltMatches = allMatches.filter(m => !ltIgnored.has(matchKey(m)));
+  renderOverlay();
+  const n = ltMatches.length;
+  setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies' : n + ' Anomalies');
 }
 
 function matchKey(m) { return m.offset + ':' + m.length + ':' + m.message; }
@@ -407,8 +417,7 @@ function renderOverlay() {
     html += escHtml(text.slice(cursor, m.offset));
     const idx = renderedMatches.length;
     renderedMatches.push(m);
-    html += '<span class="lt-error" data-idx="' + idx + '">' +
-            escHtml(text.slice(m.offset, m.offset + m.length)) + '</span>';
+    html += '<span class="lt-error" data-idx="' + idx + '">' + escHtml(text.slice(m.offset, m.offset + m.length)) + '</span>';
     cursor = m.offset + m.length;
   }
   html += escHtml(text.slice(cursor));
@@ -417,6 +426,31 @@ function renderOverlay() {
 }
 
 function syncScroll() { overlay.scrollTop = ta.scrollTop; overlay.scrollLeft = ta.scrollLeft; }
+
+// Use direct text manipulation via input events instead of breaking native key hooks
+ta.addEventListener('input', (e) => {
+  if (e.inputType === 'insertText' && e.data) {
+    const p1 = ta.selectionStart;
+    const b = ta.value.slice(0, p1 - e.data.length);
+    const a = ta.value.slice(p1);
+    
+    let res;
+    if (mode === 'cyr2lat') {
+      res = b + transStr1(e.data);
+    } else {
+      res = transStr2(b + e.data);
+    }
+    
+    ta.value = res + a;
+    ta.setSelectionRange(res.length, res.length);
+  }
+  
+  updateCount();
+  saveUndo(ta.value);
+  closeDropdown();
+  resetGrammarState();
+});
+
 ta.addEventListener('scroll', syncScroll);
 
 function openDropdown(match, anchorRect) {
@@ -450,16 +484,13 @@ function openDropdown(match, anchorRect) {
   dropdown.style.display = 'block';
   const dw = dropdown.offsetWidth  || 200;
   const dh = dropdown.offsetHeight || 160;
-  let top  = anchorRect.bottom + 4;
-  let left = anchorRect.left;
-  if (top  + dh > window.innerHeight - 8) top  = anchorRect.top - dh - 4;
-  if (left + dw > window.innerWidth  - 8) left = window.innerWidth - dw - 8;
+  let top  = anchorRect.bottom + window.scrollY + 4;
+  let left = anchorRect.left + window.scrollX;
+  if (top  + dh > window.innerHeight + window.scrollY - 8) top  = anchorRect.top + window.scrollY - dh - 4;
+  if (left + dw > window.innerWidth  + window.scrollX - 8) left = window.innerWidth + window.scrollX - dw - 8;
   if (left < 8) left = 8;
   dropdown.style.top  = top  + 'px';
   dropdown.style.left = left + 'px';
-
-  dropdownJustOpened = true;
-  setTimeout(() => { dropdownJustOpened = false; }, 0);
 }
 
 function closeDropdown() { dropdown.style.display = 'none'; }
@@ -477,8 +508,8 @@ ta.addEventListener('mouseup', () => {
   openDropdown(renderedMatches[foundIdx], rect);
 });
 
-document.addEventListener('click', () => {
-  if (dropdownJustOpened) return;
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#lt-dropdown') || e.target === ta) return;
   closeDropdown();
 });
 
@@ -490,36 +521,15 @@ ta.addEventListener('keydown', e => {
       undoStack.pop();
       ta.value = undoStack[undoStack.length - 1] || '';
       updateCount();
-      lastCheckedText = null;
       resetGrammarState();
     }
   }
 });
 
-ta.addEventListener('keypress', e => {
-  if (e.ctrlKey || e.altKey || e.metaKey) return;
-  const code = e.which || e.charCode || e.keyCode;
-  if (!code || code <= 33) return;
-  e.preventDefault();
-  const p1  = ta.selectionStart;
-  const b   = ta.value.slice(0, p1);
-  const a   = ta.value.slice(ta.selectionEnd);
-  const ch  = String.fromCharCode(code);
-  const res = mode === 'cyr2lat' ? b + transSym1(ch) : transSym2(b + ch);
-  ta.value  = res + a;
-  updateCount();
-  saveUndo(ta.value);
-  closeDropdown();
-  requestAnimationFrame(() => ta.setSelectionRange(res.length, res.length));
-  resetGrammarState();
-});
-
-ta.addEventListener('input', () => { updateCount(); saveUndo(ta.value); closeDropdown(); resetGrammarState(); });
-
 function convertAll(m) {
   const val = m === 'cyr2lat' ? transStr1(ta.value) : transStr2(ta.value);
   saveUndo(ta.value); ta.value = val; updateCount();
-  lastCheckedText = null; resetGrammarState(); ta.focus();
+  resetGrammarState(); ta.focus();
 }
 
 function insertChar(c) {
@@ -538,7 +548,7 @@ async function copyText() {
 
 function clearText() {
   saveUndo(ta.value); ta.value = ''; updateCount();
-  ltMatches = []; renderedMatches = []; ltIgnored.clear(); lastCheckedText = null;
+  ltMatches = []; renderedMatches = []; ltIgnored.clear();
   renderOverlay(); closeDropdown(); setStatus('', 'correction standby'); ta.focus();
 }
 
@@ -547,7 +557,7 @@ function ignoreMatch(match) {
   ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
   renderOverlay();
   const n = ltMatches.length;
-  setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies Detected' : n + ' Anomalies Detected');
+  setStatus(n === 0 ? 'clean' : 'errors', n === 0 ? '0 Anomalies' : n + ' Anomalies');
   closeDropdown(); ta.focus();
 }
 
@@ -559,7 +569,7 @@ function applySuggestion(match, value) {
   updateCount(); closeDropdown();
   ltIgnored.add(matchKey(match));
   ltMatches = ltMatches.filter(m => matchKey(m) !== matchKey(match));
-  renderOverlay(); lastCheckedText = null; 
+  renderOverlay(); 
   triggerGrammarCheck();
   requestAnimationFrame(() => {
     ta.setSelectionRange(before.length + value.length, before.length + value.length);
