@@ -1,27 +1,22 @@
-# UA Translit
+# B2B Repair Service Landing Page
 
-A fast, lightweight web application for bidirectional Ukrainian-Latin transliteration. It operates directly inside the browser providing an intuitive environment for real-time text transformation.
+Static landing page designed for a B2B electronics repair service operating in Linz, Austria.
 
----
+## Technology Stack
 
-## Key Features
+- **Markup:** HTML5 (Semantic elements, section-based layout)
+- **Styling:** CSS3 (Responsive design optimized for mobile and desktop viewports)
+- **Font:** Montserrat, Argentina (SIL OFL 1.1), self-hosted in `/fonts`. No request to Google Fonts.
+- **Hosting & Deployment:** Vercel, United States [Security / Compliance Note: Vercel is a United States-based cloud platform; standard data privacy and compliance terms apply.]
+- **Assets:** Photos as WebP in `/img` (about 220 KB total), own vector graphics (inline SVG icons, `img/circuit.svg`, wave dividers)
 
-* **Real-Time Bidirectional Typing:** Instantly converts Latin to Ukrainian Cyrillic or Ukrainian Cyrillic to Latin as you type.
-* **Smart Digraph Parsing:** Automatically handles multi-character phonetic sequences (e.g., typing `sh` outputs `ш`, `shh` outputs `щ`, and `g'` outputs `ґ`).
-* **Integrated Grammar Checking:** Includes an on-demand, chunk-based grammar and spell-checking overlay powered by the external LanguageTool API.
-* **Keyboard-Optimized Workflow:** Supports native browser behavior, a custom multi-step undo stack via `Ctrl + Z`, and quick dropdown dismissal via `Escape`.
-* **Responsive Dual-Theming:** Features a clean, high-contrast interface with Light and Dark modes that automatically adapt to system preferences.
-* **Character Matrix Guide:** Displays an interactive reference sidebar mapping layout combinations for quick lookup and manual character insertion.
+## Architecture & Features
 
----
+- Single-page layout with smooth anchor-based navigation
+- Integrated contact channels (Direct telephone, mailto links, Telegram web intents)
+- Responsive CSS media queries for cross-device compatibility
+- Mobile menu via one self-hosted vanilla script (`script.js`, no frameworks, no third-party requests). Without JavaScript the navigation stays visible.
 
-## Architecture & Technical Design
+## Not included on purpose
 
-### Input Capture Engine
-Intercepts input mutations via the DOM `input` event. It uses state tables (`tra` and `abc2`) to evaluate character buffers and modify values before rendering, preventing cursor position drift.
-
-### UI Hierarchy & Layout
-Built using standard CSS Custom Properties for unified theme variables, structured via CSS Grid and Flexbox for cross-platform responsiveness.
-
-### Font Stack
-Utilizes standard, system-level monospace font stacks (`SF Mono`, `Consolas`, `Menlo`) to guarantee deterministic rendering and precise alignment between the text area and the error markup overlay.
+- No Google reviews slider, no Google Maps, no contact-form plugin: each would load third-party code and contradict `datenschutz.html`.
